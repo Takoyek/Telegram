@@ -9,9 +9,9 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # اطلاعات API تلگرام
-api_id = 296483851
-api_hash = '70a40f9db3001171a7be05fef561b6'
-phone_number = '+989155840000'
+api_id = 29646851
+api_hash = '70a40f9db30071a7be02eb35fef561b6'
+phone_number = '+989155841124'
 
 # ایجاد کلاینت تلگرام
 client = TelegramClient('my_session', api_id, api_hash)
@@ -110,10 +110,13 @@ MESSAGES = {
 
 
 # لیست آی دی‌های مسدود شده
-blocked_ids = [7777, 88888]
+blocked_ids = [66666, 88888]
 # blocked_ids = [101512739, 1622957174, 133450983, 1499394623, 736768510]
 # Samadi/DATA/STAR/Apsh/Ashkan
-# Me:62251436 Mom:5913828709 MS:58962413 Mazi:1016372261 admin:6312958530
+# Me:62251436 Mom:5913828709 MS:687675142 Mazi:1016372261 admin:6312958530
+
+# کلمات کلیدی برای تشکر
+GRATITUDE_KEYWORDS = ["ممنون", "مرسی", "دست شما درد نکنه"]
 
 # تابع تبدیل اعداد فارسی به انگلیسی
 def persian_to_english_number(text):
@@ -144,56 +147,9 @@ async def handler(event):
     text = persian_to_english_number(event.raw_text.strip())
 
     logger.info(f"Received message from {user_id}: {text}")
-
-    # شرط خاص برای کاربر با آیدی 58962413 و ایموجی 😂
-    if user_id == 58962413 and "😂" in text:
-        await send_messages(event, "😂😂")
-        return  # خروج از تابع تا بقیه کد اجرا نشود
-
-    # شرط اصلی برای بررسی کلمات کلیدی
-    if any(keyword in text for keyword in ["سلام", "درود", "salam", "Salam", "hi", "Hi"]):
-        # بررسی خاص برای کاربر با آیدی 58962413
-        if user_id == 58962413:
-            # دریافت نام کاربر از دیتابیس
-            user = session.query(UserState).filter_by(user_id=user_id).first()
-            username = user.state if user else "کاربر"
-            
-            # ارسال پیام جدید با نام کاربری
-            await send_messages(event, f"سلام 😍 به روی ماهت، به چشمای خمارت!\n{username}  گله گلاب، مقدمتان گلباران 🌻🌼🌸🏵 \nهووووورااااااا 🎊 🎉 🍓 🍉 🍑 🍒 🎀")
-            await send_messages(event, "حالتون چطوره؟\nخوب هستین؟")
-        
-        # ادامه روند عادی برنامه
-        user = session.query(UserState).filter_by(user_id=user_id).first()
-        if user:
-            await send_messages(event, MESSAGES["welcome_user"].format(username=user.state))
-            await send_messages(event, MESSAGES["main_menu"])
-            user_state[user_id] = "main_menu"
-            return
-        else:
-            await send_messages(event, MESSAGES["greeting"])
-            await send_messages(event, MESSAGES["name_request"])
-            user_state[user_id] = "awaiting_name"
-            return
-
-    # شرط جدید برای کاربر با آیدی 58962413 و ارسال "فعلا" یا "بای"
-    if user_id == 58962413 and any(keyword in text for keyword in ["فعلا", "بای"]):
-        await event.respond(
-            "اگه مه یار نباشی خل بومه👿\n"
-            "غذا زیاد خرمه من ضخیم بومه🤕\n"
-            "خشی بومه تا صواحی بیدار بومه🥱\n"
-            "سازنده یه فیلم غیر اخلاقی بومه😵\n"
-            "بازنده بومه اما خدا دونه بد نومه🥴\n"
-            "پمپاژ قلب من زیبای من تویی دلخواه من😍"
-        )
-        return
-
-    if "ممنون" in text or "مرسی" in text:
-        if event.chat_id == 58962413:
-            user = session.query(UserState).filter_by(user_id=event.sender_id).first()
-            username = user.state if user else "کاربر"
-            await event.respond(f"خواهش میکنم 🌼 {username} قند عسل 🌸")
-        else:
-            await event.respond("خواهش میکنم 🌺")
+    
+    if any(keyword in text for keyword in GRATITUDE_KEYWORDS):
+        await event.respond("خواهش میکنم 🌺")
 
     if any(keyword in text for keyword in ["سلام", "درود", "salam", "Salam", "hi", "Hi"]):
         user = session.query(UserState).filter_by(user_id=user_id).first()
